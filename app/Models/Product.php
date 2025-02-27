@@ -24,7 +24,8 @@ class Product extends Model
         'origin',
         'brand',
         'country',
-        'serviceable'
+        'serviceable',
+
     ];
 
     public function shop()
@@ -35,6 +36,11 @@ class Product extends Model
     public function category()
     {
         return $this->belongsTo(Category::class);
+    }
+
+    public function productLink()
+    {
+        return $this->belongsTo(ProductLink::class);
     }
 
     public function prices()

@@ -8,13 +8,11 @@ use Illuminate\Database\Eloquent\Model;
 class Price extends Model
 {
     use HasFactory;
-    protected $fillable = ['product_id', 'shop_id', 'price'];
+
+    protected $fillable = ['product_id', 'price'];
+
     public function product()
     {
         return $this->belongsTo(Product::class);
-    }
-    public function shop()
-    {
-        return $this->belongsTo(Shop::class);
     }
 }

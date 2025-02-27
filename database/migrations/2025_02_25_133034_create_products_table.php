@@ -13,8 +13,22 @@ return new class extends Migration
     {
         Schema::create('products', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('shop_id')->constrained('shops');
-            $table->foreignId('category_id')->nullable()->constrained('categories');
+
+            // Внешний ключ для связи с таблицей магазинов (shops)
+            $table->foreignId('shop_id')
+                ->constrained('shops')
+                ->onDelete('cascade');
+
+            // Внешний ключ для связи с таблицей категорий (categories)
+            $table->foreignId('category_id')
+                ->constrained('categories')
+                ->onDelete('cascade');
+
+
+            $table->foreignId('product_link_id')->constrained('product_links')->onDelete('cascade');
+            $table->unique('product_link_id'); // Устанавливаем уникальность отдельно
+
+
             $table->string('name');
             $table->string('voltage')->nullable();
             $table->string('capacity')->nullable();

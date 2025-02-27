@@ -11,9 +11,15 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('alerts', function (Blueprint $table) {
+        Schema::create('prices', function (Blueprint $table) {
             $table->id();
-            $table->decimal('target_price', 10, 2)->nullable();
+
+            $table->foreignId('product_id')
+                ->constrained('products')
+                ->onDelete('cascade');
+
+            $table->decimal('price', 10, 2);
+
             $table->timestamps();
         });
     }
@@ -23,6 +29,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('alerts');
+        Schema::dropIfExists('prices');
     }
 };

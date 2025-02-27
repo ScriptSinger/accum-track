@@ -19,10 +19,12 @@ class DatabaseSeeder extends Seeder
         // Вызов сидера для Shops
         $this->call(ShopSeeder::class);
 
+        $this->call(CategorySeeder::class);
 
-        User::factory()->create([
-            'name' => 'Test User',
-            'email' => 'test@example.com',
-        ]);
+
+        // User::factory()->create([
+        //     'name' => 'Test User',
+        //     'email' => 'test@example.com',
+        // ]);
     }
 }
