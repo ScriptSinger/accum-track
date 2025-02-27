@@ -35,4 +35,12 @@ return [
         ],
     ],
 
+
+    'http' => [
+        'base_uri' => env('HTTP_BASE_URI', 'https://ufamasters.ru/articles/lineynyy-i-bldc-kompressory-otlichiya-preimushchestva-i-primenenie'),
+        'timeout'  => env('HTTP_TIMEOUT', 10),
+        'proxy'    => env('HTTP_PROXY', null),
+    ],
+
+
 ];
