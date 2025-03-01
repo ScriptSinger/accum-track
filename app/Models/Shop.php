@@ -11,8 +11,21 @@ class Shop extends Model
 
     protected $fillable = ['name', 'url'];
 
+
+    public function categoryLinks()
+    {
+        return $this->hasMany(CategoryLink::class);
+    }
+
+
     public function products()
     {
         return $this->hasMany(Product::class);
+    }
+
+
+    public function productLinks()
+    {
+        return $this->hasMany(ProductLink::class);
     }
 }

@@ -15,6 +15,7 @@ return new class extends Migration
             $table->id();
             $table->string('name');
             $table->string('url');
+            $table->string('category_url_pattern')->nullable(); // Шаблон для поиска ссылок на категории
             $table->timestamps();
         });
     }

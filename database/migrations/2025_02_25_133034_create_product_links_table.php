@@ -14,6 +14,9 @@ return new class extends Migration
         Schema::create('product_links', function (Blueprint $table) {
             $table->id();
             $table->string('url')->unique();
+            $table->foreignId('shop_id')->constrained('shops')->onDelete('cascade'); // Связь с таблицей shops
+            $table->boolean('processed')->default(false);
+            $table->timestamp('processed_at')->nullable();
             $table->timestamps();
         });
     }

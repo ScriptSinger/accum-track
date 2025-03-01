@@ -2,31 +2,22 @@
 
 namespace App\Factories;
 
-
-use App\Models\Shop;
 use App\Interfaces\ShopParserInterface;
-use App\Services\Parsers\StartStopParser;
-use App\Services\Parsers\UfaAkbParser;
+use App\Models\Shop;
 use App\Services\HttpClientService;
 
 use Exception;
 
 class ShopParserFactory
 {
-    /**
-     * Создает экземпляр парсера для указанного магазина.
-     *
-     * @param Shop $shop
-     * @param HttpClientService $httpClient
-     * @return ShopParserInterface
-     * @throws Exception
-     */
-    public static function make(Shop $shop, HttpClientService $httpClient): ShopParserInterface
+    public static function make(HttpClientService $httpClient, Shop $shop)
     {
-        return match ($shop->name) {
-                // 'Старт стоп' => new StartStopParser($httpClient),
-                // 'Мир аккумуляторов' => new UfaAkbParser($httpClient),
-            default => throw new Exception("Парсер для {$shop->name} не найден"),
-        };
+        $parsers = config('parsers');
+
+        if (!isset($parsers[$shop->name])) {
+            throw new Exception("Парсер для {$shop->name} не найден.");
+        }
+
+        return new $parsers[$shop->name]($httpClient);
     }
 }
