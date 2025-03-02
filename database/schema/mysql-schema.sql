@@ -149,6 +149,7 @@ CREATE TABLE `product_links` (
   `id` bigint unsigned NOT NULL AUTO_INCREMENT,
   `url` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
   `shop_id` bigint unsigned NOT NULL,
+  `category_link_id` bigint unsigned NOT NULL,
   `processed` tinyint(1) NOT NULL DEFAULT '0',
   `processed_at` timestamp NULL DEFAULT NULL,
   `created_at` timestamp NULL DEFAULT NULL,
@@ -156,6 +157,8 @@ CREATE TABLE `product_links` (
   PRIMARY KEY (`id`),
   UNIQUE KEY `product_links_url_unique` (`url`),
   KEY `product_links_shop_id_foreign` (`shop_id`),
+  KEY `product_links_category_link_id_foreign` (`category_link_id`),
+  CONSTRAINT `product_links_category_link_id_foreign` FOREIGN KEY (`category_link_id`) REFERENCES `category_links` (`id`) ON DELETE CASCADE,
   CONSTRAINT `product_links_shop_id_foreign` FOREIGN KEY (`shop_id`) REFERENCES `shops` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
@@ -258,14 +261,14 @@ CREATE TABLE `users` (
 /*!40014 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
-INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (369,'0001_01_01_000000_create_users_table',1);
-INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (370,'0001_01_01_000001_create_cache_table',1);
-INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (371,'0001_01_01_000002_create_jobs_table',1);
-INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (372,'2025_02_25_133033_create_alerts_table',1);
-INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (373,'2025_02_25_133033_create_categories_table',1);
-INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (374,'2025_02_25_133033_create_shops_table',1);
-INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (375,'2025_02_25_133034_create_product_links_table',1);
-INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (376,'2025_02_25_133034_create_products_table',1);
-INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (377,'2025_02_25_133034_create_scraping_logs_table',1);
-INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (378,'2025_02_25_133035_create_prices_table',1);
-INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (379,'2025_02_27_133451_create_category_links_table',1);
+INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (12,'0001_01_01_000000_create_users_table',1);
+INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (13,'0001_01_01_000001_create_cache_table',1);
+INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (14,'0001_01_01_000002_create_jobs_table',1);
+INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (15,'2025_02_25_133033_create_alerts_table',1);
+INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (16,'2025_02_25_133033_create_shops_table',1);
+INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (17,'2025_02_25_133034_create_scraping_logs_table',1);
+INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (18,'2025_02_27_133451_create_category_links_table',1);
+INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (19,'2025_02_27_133452_create_categories_table',1);
+INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (20,'2025_02_27_133452_create_product_links_table',1);
+INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (21,'2025_02_27_133453_create_products_table',1);
+INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (22,'2025_02_27_133454_create_prices_table',1);

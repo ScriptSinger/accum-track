@@ -5,15 +5,27 @@ namespace App\Services\Importers;
 use App\Models\CategoryLink;
 use App\Models\ProductLink;
 use App\Models\Shop;
+use Illuminate\Support\Facades\Log;
 
 class ShopDataRecorder
 {
     public function importProductLinks(array $links, Shop $shop): void
     {
         foreach ($links as $link) {
+            // Проверяем, что 'url' и 'category_link_id' не пустые
+            if (empty($link['url']) || empty($link['category_link_id'])) {
+                Log::warning("Пропущена запись: отсутствует URL или category_link_id", $link);
+                continue;
+            }
+
             ProductLink::firstOrCreate(
-                ['url' => $link],
-                ['shop_id' => $shop->id]
+                [
+                    'url' => $link['url']
+                ],
+                [
+                    'shop_id' => $shop->id,
+                    'category_link_id' => $link['category_link_id']
+                ]
             );
         }
     }

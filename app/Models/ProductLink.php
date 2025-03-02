@@ -10,6 +10,7 @@ class ProductLink extends Model
     protected $fillable = [
         'url',
         'shop_id',
+        'category_link_id',
         'processed'
 
     ];
@@ -24,5 +25,10 @@ class ProductLink extends Model
     public function shop()
     {
         return $this->belongsTo(Shop::class); // Связь многие к одному
+    }
+
+    public function category_link()
+    {
+        return $this->belongsTo(CategoryLink::class); // Связь многие к одному
     }
 }

@@ -21,6 +21,7 @@ return new class extends Migration
 
             // Внешний ключ для связи с таблицей категорий (categories)
             $table->foreignId('category_id')
+                ->nullable()
                 ->constrained('categories')
                 ->onDelete('cascade');
 

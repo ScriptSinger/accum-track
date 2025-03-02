@@ -15,6 +15,8 @@ return new class extends Migration
             $table->id();
             $table->string('url')->unique();
             $table->foreignId('shop_id')->constrained('shops')->onDelete('cascade'); // Связь с таблицей shops
+            $table->foreignId('category_link_id')->constrained('category_links')->onDelete('cascade'); // Связь с таблицей categoies_links
+
             $table->boolean('processed')->default(false);
             $table->timestamp('processed_at')->nullable();
             $table->timestamps();
