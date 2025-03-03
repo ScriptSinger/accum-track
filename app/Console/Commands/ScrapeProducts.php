@@ -39,7 +39,11 @@ class ScrapeProducts extends Command
 
         $parser = $this->shopParserFactory->make($this->httpClient, $shop);
 
-        $data = $parser->scrapeProducts($this->httpClient, $productLinks);
+        $data = $parser->scrapeProducts($this->httpClient, $productLinks, $shop);
+
+
+
+        $this->ShopDataRecorder->importProducts($data);
     }
 
 

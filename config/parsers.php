@@ -7,5 +7,5 @@ return [
 ];
 
 //При изменении config обновлять кэш
-// sail artisan config:clear
+ 
 // sail artisan config:cache

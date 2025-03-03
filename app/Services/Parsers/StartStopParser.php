@@ -5,6 +5,7 @@ namespace App\Services\Parsers;
 use App\Models\CategoryLink;
 use App\Models\Shop;
 use App\Services\HttpClientService;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\Log;
 use Symfony\Component\DomCrawler\Crawler;
 
@@ -119,83 +120,73 @@ class StartStopParser
 
 
 
-    public function scrapeProducts(HttpClientService $httpClient, $productLinks)
+    public function scrapeProducts(HttpClientService $httpClient, Collection $productLinks, Shop $shop)
     {
         $productDetails = [];
 
-        foreach ($productLinks as $productLinkData) {
-            $productLink = $productLinkData['url'];
 
-            if (!$productLink) {
+        foreach ($productLinks as $productLink) {
+            $url = $productLink['url'];
+            if (!$url) {
                 continue;
             }
-
-            $response = $httpClient->get($productLink);
-
+            $response = $httpClient->get($url);
             $html = $response->getBody()->getContents();
             $crawler = new Crawler($html);
-            $nodes = $crawler->filter('.product-data__item-div');
+            $result = [];
+            $crawler->filter('.product-data__item')->each(function (Crawler $node) use (&$result) {
+                $items = $node->filter('.product-data__item-div');
+                if ($items->count() > 1) {
+                    $key = trim($items->eq(0)->text());
+                    $value = trim($items->eq(1)->text());
+                    $result[$key] = $value;
+                }
+            });
 
-            dump($crawler->html());
-            exit;
+            // Извлечение заголовка страницы (h1) и установка его как name продукта
+            if ($crawler->filter('h1')->count() > 0) {
+                $result['name'] = trim($crawler->filter('h1')->first()->text());
+            } else {
+                $result['name'] = '';
+            }
 
 
-            // Извлекаем основные данные о товаре
-            $productName = $crawler->filter('h1.product-title')->count()
-                ? $crawler->filter('h1.product-title')->text()
-                : 'Название не найдено';
-
-
-            $productPrice = $crawler->filter('span.product-price')->count()
-                ? $crawler->filter('span.product-price')->text()
-                : 'Цена не найдена';
-
-
-
-            $productDescription = $crawler->filter('div.product-description')->text();
-
-            // Извлекаем характеристики
-            $specifications = $this->parseProductSpecifications($html);
-
-            // Добавляем в массив результатов
-            $productDetails[] = [
-                'url' => $productLink,
-                'name' => $productName,
-                'price' => $productPrice,
-                'description' => $productDescription,
-                'category_link_id' => $productLinkData['category_link_id'],
-                'specifications' => $specifications,
-            ];
-
-            break; // Выход после первой итерации
+            $result['shop_id'] = $shop->id;
+            $result['product_link_id'] = $productLink->id;
+            $productDetails[] = $result;
         }
 
-        dd($productDetails); // Отладочный вывод
-        return $productDetails;
+        // Применяем маппинг для магазина 'start-stop'
+        return $this->mapProductDetails($productDetails, $shop->name);
     }
 
-
     /**
-     * Парсинг характеристик продукта.
+     * Преобразует массив "сырых" данных продуктов согласно конфигурационному маппингу.
      *
-     * @param string $html HTML-код страницы товара.
-     * @return array Ассоциативный массив характеристик.
+     * @param array  $products Массив продуктов в формате "ключ => значение"
+     * @param string $shop     Идентификатор магазина (например, 'start-stop')
+     *
+     * @return array Преобразованный массив с ключами, соответствующими полям БД
      */
-    public function parseProductSpecifications(string $html): array
+
+    protected function mapProductDetails(array $products, string $shop): array
     {
-        $crawler = new Crawler($html);
-        $specifications = [];
+        $productConfig = config("product.{$shop}.fields", []);
 
-        // Проверяем, есть ли секция характеристик
-        $crawler->filter('.product-data__item')->each(function (Crawler $node) use (&$specifications) {
-            $key = trim($node->filter('.product-data__item-div')->eq(0)->text());
-            $value = trim($node->filter('.product-data__item-div')->eq(1)->text());
+        return array_map(function ($product) use ($productConfig) {
+            $mapped = [];
 
-            if (!empty($key) && !empty($value)) {
-                $specifications[$key] = $value;
+            foreach ($product as $originalKey => $value) {
+                if (isset($productConfig[$originalKey])) {
+                    $mappedKey = $productConfig[$originalKey];
+                    $mapped[$mappedKey] = $value;
+                } else {
+                    // Оставляем ключ без изменений, если он отсутствует в конфиге
+                    $mapped[$originalKey] = $value;
+                }
             }
-        });
 
-        return $specifications;
+            return $mapped;
+        }, $products);
     }
 }

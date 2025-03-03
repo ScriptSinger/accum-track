@@ -3,6 +3,7 @@
 namespace App\Services\Importers;
 
 use App\Models\CategoryLink;
+use App\Models\Product;
 use App\Models\ProductLink;
 use App\Models\Shop;
 use Illuminate\Support\Facades\Log;
@@ -45,12 +46,24 @@ class ShopDataRecorder
                     [
                         'category_name' => $link['name'],
                         'shop_id'       => $shop->id,
+                        'category_id' => 1
                     ],
                     [
                         'category_url'  => $link['url'],
                     ]
                 );
             }
+        }
+    }
+
+
+    public function importProducts(array $data)
+    {
+        foreach ($data as $product) {
+            Product::updateOrCreate(
+                ['product_link_id' => $product['product_link_id']], // Поиск по этому ключу
+                $product // Обновляем или вставляем все переданные данные
+            );
         }
     }
 }

@@ -10,10 +10,17 @@ class CategoryLink extends Model
         'category_name',
         'category_url',
         'shop_id',
+        'category_id'
     ];
 
     public function productLinks()
     {
         return $this->hasMany(ProductLink::class);
+    }
+
+
+    public function category()
+    {
+        return $this->belongsTo(Category::class);
     }
 }

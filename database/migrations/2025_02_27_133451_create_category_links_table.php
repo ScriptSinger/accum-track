@@ -17,6 +17,11 @@ return new class extends Migration
                 ->constrained('shops')              // Создаёт внешний ключ для связи с таблицей shops
                 ->onDelete('cascade');              // При удалении магазина удаляются и его категории
 
+            // Внешний ключ для связи с таблицей категорий (categories)
+            $table->foreignId('category_id')
+                ->constrained('categories');
+
+
             $table->string('category_name');        // Название категории
             $table->string('category_url');         // Ссылка на категорию
 

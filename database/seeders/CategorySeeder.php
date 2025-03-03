@@ -13,6 +13,13 @@ class CategorySeeder extends Seeder
      */
     public function run(): void
     {
+        // Сначала создаем категорию с id = 1, которая будет служить как "Нет категории"
+        Category::firstOrCreate(
+            ['id' => 1],
+            ['name' => 'No Category'] // Здесь задаем название категории как "No Category"
+        );
+
+        // Затем добавляем другие категории
         $categories = [
             ['name' => 'Грузовые'],
             ['name' => 'Автомобильные'],

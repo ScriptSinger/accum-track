@@ -9,6 +9,7 @@ class Product extends Model
 {
     use HasFactory;
     protected $fillable = [
+        'product_link_id',
         'shop_id',
         'category_id',
         'name',
@@ -33,10 +34,7 @@ class Product extends Model
         return $this->belongsTo(Shop::class);
     }
 
-    public function category()
-    {
-        return $this->belongsTo(Category::class);
-    }
+
 
     public function productLink()
     {

@@ -19,16 +19,8 @@ return new class extends Migration
                 ->constrained('shops')
                 ->onDelete('cascade');
 
-            // Внешний ключ для связи с таблицей категорий (categories)
-            $table->foreignId('category_id')
-                ->nullable()
-                ->constrained('categories')
-                ->onDelete('cascade');
-
-
             $table->foreignId('product_link_id')->constrained('product_links')->onDelete('cascade');
             $table->unique('product_link_id'); // Устанавливаем уникальность отдельно
-
 
             $table->string('name');
             $table->string('voltage')->nullable();
