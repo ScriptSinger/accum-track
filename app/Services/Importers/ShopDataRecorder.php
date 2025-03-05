@@ -3,9 +3,11 @@
 namespace App\Services\Importers;
 
 use App\Models\CategoryLink;
+use App\Models\Price;
 use App\Models\Product;
 use App\Models\ProductLink;
 use App\Models\Shop;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Log;
 
 class ShopDataRecorder
@@ -60,9 +62,27 @@ class ShopDataRecorder
     public function importProducts(array $data)
     {
         foreach ($data as $product) {
-            Product::updateOrCreate(
-                ['product_link_id' => $product['product_link_id']], // Поиск по этому ключу
-                $product // Обновляем или вставляем все переданные данные
+            // Отделяем данные о продукте и цене
+            $productData = Arr::except($product, ['price']);
+            $priceData = $product['price'];
+
+            // Создаем или обновляем продукт
+            $productModel = Product::updateOrCreate(
+                ['product_link_id' => $productData['product_link_id']],
+                $productData
+            );
+
+            // Сохраняем цену, привязывая ее к product_id
+            Price::updateOrCreate(
+                [
+                    'product_id' => $productModel->id,
+                    'date'       => $priceData['date'] // Цена уникальна на определенную дату
+                ],
+                [
+                    'price'          => $priceData['price'],
+                    'trade_in_price' => $priceData['trade_in_price'],
+                    'currency'       => $priceData['currency'],
+                ]
             );
         }
     }

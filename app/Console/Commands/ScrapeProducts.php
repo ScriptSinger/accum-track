@@ -34,14 +34,10 @@ class ScrapeProducts extends Command
         $shopName = $this->argument('shop');
         $categoryLinkIds = $this->option('categoryLinkId'); // массив ID категорий
         $shop = Shop::where('name', $shopName)->firstOrFail();
-
-        $productLinks = $this->getProductLinks($shop, $categoryLinkIds); //массив Объектов
-
+        $productLinks = $this->getProductLinks($shop, $categoryLinkIds); // массив Объектов
         $parser = $this->shopParserFactory->make($this->httpClient, $shop);
 
         $data = $parser->scrapeProducts($this->httpClient, $productLinks, $shop);
-
-
 
         $this->ShopDataRecorder->importProducts($data);
     }
@@ -51,7 +47,6 @@ class ScrapeProducts extends Command
     protected function getProductLinks(Shop $shop, array $categoryLinkIds = [])
     {
         if ($categoryLinkIds) {
-            // Фильтруем по categoryLinkIds
             return ProductLink::where('shop_id', $shop->id)
                 ->whereIn('category_link_id', $categoryLinkIds)
                 ->get();

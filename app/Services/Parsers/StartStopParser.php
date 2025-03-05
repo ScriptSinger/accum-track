@@ -134,6 +134,9 @@ class StartStopParser
             $html = $response->getBody()->getContents();
             $crawler = new Crawler($html);
             $result = [];
+
+
+            // 1. Извлечение характеристик продукта
             $crawler->filter('.product-data__item')->each(function (Crawler $node) use (&$result) {
                 $items = $node->filter('.product-data__item-div');
                 if ($items->count() > 1) {
@@ -143,16 +146,54 @@ class StartStopParser
                 }
             });
 
-            // Извлечение заголовка страницы (h1) и установка его как name продукта
+            // 2. Извлечение заголовка страницы (h1) и установка его как name продукта
             if ($crawler->filter('h1')->count() > 0) {
                 $result['name'] = trim($crawler->filter('h1')->first()->text());
             } else {
                 $result['name'] = '';
             }
 
-
+            // 3. Добавление идентификаторов магазина и ссылки на продукт
             $result['shop_id'] = $shop->id;
             $result['product_link_id'] = $productLink->id;
+
+
+            // 4. Новый блок: Извлечение цен (обычная и trade-in)
+            $priceElement = $crawler->filter('.product-page__price.price');
+            $tradeInElement = $crawler->filter('.option__val');
+
+            if ($priceElement->count() > 0) {
+                // Обычная цена извлекается из атрибута data-price
+                $regularPrice = $priceElement->attr('data-price');
+
+                // Trade-in цена ищется в .option__val, извлекаем числовое значение
+                $tradeInPrice = null;
+                if ($tradeInElement->count() > 0) {
+                    $tradeInText = trim($tradeInElement->text());
+                    preg_match('/\d+/', $tradeInText, $matches);
+                    if (!empty($matches)) {
+                        $tradeInPrice = $matches[0]; // Первое найденное число — это цена
+                    }
+                }
+
+
+                // Формирование структуры для цен, соответствующей схеме таблицы prices
+                $result['price'] = [
+                    'price'          => $regularPrice,     // Маппинг в колонку "price"
+                    'trade_in_price' => $tradeInPrice,     // Маппинг в колонку "trade_in_price"
+                    'currency'       => 'RUB',
+                    'date'           => date('Y-m-d')
+                ];
+            } else {
+                // Если блок с ценой отсутствует, устанавливаем значения по умолчанию
+                $result['price'] = [
+                    'price'          => null,
+                    'trade_in_price' => null,
+                    'currency'       => 'RUB',
+                    'date'           => date('Y-m-d')
+                ];
+            }
+
             $productDetails[] = $result;
         }
 

@@ -6,7 +6,7 @@ use App\Factories\ShopParserFactory;
 use App\Models\Shop;
 use App\Services\HttpClientService;
 use App\Services\Importers\ShopDataRecorder;
-
+use App\Services\Utils\PerformanceService;
 use Illuminate\Console\Command;
 
 class ScrapeProductLinks extends Command
@@ -27,36 +27,21 @@ class ScrapeProductLinks extends Command
         $this->httpClient = $httpClient;
     }
 
-    public function handle()
+    public function handle(PerformanceService $performanceService)
     {
-        $this->measurePerformance(function () {
+        $shopName = $this->argument('shop');
 
-            $shopName = $this->argument('shop');
+        // Обертываем всю операцию в замер производительности
+        $performanceService->measure(function () use ($shopName) {
+
+
             $shop = Shop::where('name', $shopName)->firstOrFail();
             $parser = $this->shopParserFactory->make($this->httpClient, $shop);
             $data = $parser->scrapeProductLinks($this->httpClient, $shop);
-
             $this->ShopDataRecorder->importProductLinks($data, $shop);
-        });
-    }
 
 
-    /**
-     * Оборачивает выполнение кода замыканием и замеряет время выполнения и потребление памяти.
-     *
-     * @param callable $callback Функция для измерения
-     */
-    protected function measurePerformance(callable $callback)
-    {
-        $startTime = microtime(true);
-        $startMemory = memory_get_usage();
-
-        $callback();
-
-        $executionTime = round(microtime(true) - $startTime, 4);
-        $memoryUsage = round((memory_get_usage() - $startMemory) / 1024 / 1024, 2);
-
-        $this->info("Обработка завершена за {$executionTime} секунд");
-        $this->info("Потребление памяти: {$memoryUsage} МБ");
+            //
+        }, $this->output, "Обработка магазина: {$shopName}");
     }
 }

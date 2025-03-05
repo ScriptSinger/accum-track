@@ -19,7 +19,8 @@ return new class extends Migration
                 ->onDelete('cascade');
 
             $table->decimal('price', 10, 2);
-
+            $table->decimal('trade_in_price', 10, 2)->nullable();
+            $table->date('date');
             $table->timestamps();
         });
     }
