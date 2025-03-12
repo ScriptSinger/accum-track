@@ -15,7 +15,7 @@ class ShopSeeder extends Seeder
     {
         Shop::create([
             'name' => 'start-stop',
-            'url' => 'http://start-stop.su',
+            'url' => 'https://start-stop.su',
         ]);
 
         Shop::create([
