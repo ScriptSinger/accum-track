@@ -2,6 +2,7 @@
 
 namespace App\Console\Commands;
 
+use App\Events\CategoryLinksScraped;
 use App\Jobs\ScrapeCategoryLinksJob;
 use App\Models\Shop;
 use Illuminate\Console\Command;
@@ -19,6 +20,10 @@ class ScrapeCategoryLinks extends Command
         $shopName = $this->argument('shop');
         $shop = Shop::where('name', $shopName)->firstOrFail();
         ScrapeCategoryLinksJob::dispatch($shop->id);
+
         $this->info("Job dispatched for shop: {$shop->name}");
+
+        // Запускаем событие
+        event(new CategoryLinksScraped());
     }
 }

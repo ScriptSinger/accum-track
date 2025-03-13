@@ -2,6 +2,7 @@
 
 namespace App\Console\Commands;
 
+use App\Events\ProductLinksScraped;
 use App\Jobs\ScrapeProductLinksJob;
 use App\Models\Shop;
 
@@ -22,5 +23,8 @@ class ScrapeProductLinks extends Command
         $shop = Shop::where('name', $shopName)->firstOrFail();
         ScrapeProductLinksJob::dispatch($shop->id);
         $this->info("Job dispatched for shop: {$shop->name}");
+
+        // Запускаем событие
+        event(new ProductLinksScraped());
     }
 }
