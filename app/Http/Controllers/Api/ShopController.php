@@ -3,92 +3,39 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Api\Shop\ShopStoreRequest;
+use App\Http\Requests\Api\Shop\ShopUpdateRequest;
 use App\Models\Shop;
-use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 
 class ShopController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
     public function index()
     {
         $shops = Shop::all();
-
         return response()->json($shops, Response::HTTP_OK);
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request)
+    public function store(ShopStoreRequest $request)
     {
-        $data = $request->validate([
-            'name' => 'required|string|max:255|unique:shops,name',
-            'url' => 'required|url|unique:shops,url',
-        ]);
-
-        $shop = Shop::create($data);
-
-
+        $shop = Shop::create($request->validated());
         return response()->json($shop, Response::HTTP_CREATED);
     }
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(string $id)
+    public function show(Shop $shop)
     {
-        $shop = Shop::find($id);
-
-        if (!$shop) {
-            return response()->json([
-                'message' => 'Магазин не найден'
-            ], Response::HTTP_NOT_FOUND);
-        }
-
         return response()->json($shop, Response::HTTP_OK);
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, string $id)
+    public function update(ShopUpdateRequest $request, Shop $shop)
     {
-        $shop = Shop::find($id);
-
-        if (!$shop) {
-            return response()->json([
-                'message' => 'Магазин не найден'
-            ], Response::HTTP_NOT_FOUND);
-        }
-
-        $data = $request->validate([
-            'name' => 'required|string|max:255|unique:shops,name,' . $shop->id,
-            'url' => 'url|unique:shops,url',
-        ]);
-
-        $shop->update($data);
-
+        $shop->update($request->validated());
         return response()->json($shop, Response::HTTP_OK);
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(string $id)
+    public function destroy(Shop $shop)
     {
-        $shop = Shop::find($id);
-
-        if (!$shop) {
-            return response()->json([
-                'message' => 'Магазин не найден'
-            ], Response::HTTP_NOT_FOUND);
-        }
-
         $shop->delete();
-
         return response()->json([
             'message' => 'Магазин успешно удален'
         ], Response::HTTP_OK);
